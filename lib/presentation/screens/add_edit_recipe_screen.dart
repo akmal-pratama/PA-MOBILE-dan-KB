@@ -1,15 +1,18 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:dapur_pintar/domain/models/recipe.dart';
-import 'package:dapur_pintar/application/providers/home_provider.dart';
-import 'package:dapur_pintar/application/providers/saved_recipes_provider.dart'; 
+// Import library yang diperlukan
+import 'dart:io'; // Untuk File operations
+import 'package:flutter/material.dart'; // Widget Flutter dasar
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // State management dengan Riverpod
+import 'package:image_picker/image_picker.dart'; // Untuk memilih gambar dari galeri/kamera
+import 'package:go_router/go_router.dart'; // Routing dengan GoRouter
+import 'package:path_provider/path_provider.dart'; // Untuk mendapatkan directory aplikasi
+import 'package:dapur_pintar/domain/models/recipe.dart'; // Model Recipe
+import 'package:dapur_pintar/application/providers/home_provider.dart'; // Provider untuk home
+import 'package:dapur_pintar/application/providers/saved_recipes_provider.dart'; // Provider untuk saved recipes
 
+/// Screen untuk menambah atau mengedit resep
+/// Jika recipe tidak null, maka mode edit, jika null maka mode tambah baru
 class AddEditRecipeScreen extends ConsumerStatefulWidget {
-  final Recipe? recipe;
+  final Recipe? recipe; // Resep yang akan diedit (null jika menambah baru)
 
   const AddEditRecipeScreen({Key? key, this.recipe}) : super(key: key);
 
@@ -18,19 +21,24 @@ class AddEditRecipeScreen extends ConsumerStatefulWidget {
       _AddEditRecipeScreenState();
 }
 
+/// State class untuk AddEditRecipeScreen
 class _AddEditRecipeScreenState extends ConsumerState<AddEditRecipeScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(); // Key untuk form validation
 
-  late TextEditingController _titleController;
-  late TextEditingController _durationController;
-  late TextEditingController _ingredientsController;
-  late TextEditingController _stepsController;
-  late String _selectedDifficulty;
-  late String _selectedCategory;
+  // Controller untuk text field
+  late TextEditingController _titleController; // Controller untuk field judul
+  late TextEditingController _durationController; // Controller untuk field durasi
+  late TextEditingController _ingredientsController; // Controller untuk field bahan
+  late TextEditingController _stepsController; // Controller untuk field langkah-langkah
+  
+  // State untuk dropdown
+  late String _selectedDifficulty; // Tingkat kesulitan yang dipilih
+  late String _selectedCategory; // Kategori yang dipilih
 
-  final ImagePicker _picker = ImagePicker();
-  String? _selectedImagePath;
+  final ImagePicker _picker = ImagePicker(); // ImagePicker untuk memilih gambar
+  String? _selectedImagePath; // Path gambar yang dipilih
 
+  // Getter untuk menentukan apakah sedang dalam mode edit
   bool get _isEditing => widget.recipe != null;
 
   @override
@@ -60,26 +68,37 @@ class _AddEditRecipeScreenState extends ConsumerState<AddEditRecipeScreen> {
     super.dispose();
   }
 
+  /// Method untuk memilih gambar dari galeri atau kamera
+  /// Gambar akan disalin ke directory aplikasi dan path-nya disimpan
+  /// 
+  /// Parameter:
+  /// - source: Sumber gambar (ImageSource.gallery atau ImageSource.camera)
   Future<void> _pickImage(ImageSource source) async {
     try {
+      // Memilih gambar dengan kualitas 85% dan max width 1920px
       final XFile? image = await _picker.pickImage(
-        source: source,
-        imageQuality: 85,
-        maxWidth: 1920,
+        source: source, // Sumber gambar (galeri/kamera)
+        imageQuality: 85, // Kualitas gambar 85%
+        maxWidth: 1920, // Max width 1920px untuk optimasi
       );
 
       if (image != null) {
+        // Mendapatkan directory aplikasi untuk menyimpan gambar
         final appDir = await getApplicationDocumentsDirectory();
+        // Membuat nama file unik dengan timestamp
         final fileName =
             '${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+        // Menyalin gambar ke directory aplikasi
         final savedImage =
             await File(image.path).copy('${appDir.path}/$fileName');
 
+        // Update state dengan path gambar yang baru
         setState(() {
           _selectedImagePath = savedImage.path;
         });
       }
     } catch (e) {
+      // Menampilkan error jika gagal memilih gambar
       _showSnackBar('Gagal memilih gambar: ${e.toString()}', isError: true);
     }
   }
@@ -114,40 +133,51 @@ class _AddEditRecipeScreenState extends ConsumerState<AddEditRecipeScreen> {
     }
   }
 
+  /// Method untuk submit form (menambah atau mengupdate resep)
+  /// Validasi form, parse data, dan simpan ke database
   void _submit() async {
+    // Validasi form, jika tidak valid maka return
     if (!_formKey.currentState!.validate()) return;
 
+    // Validasi gambar harus dipilih
     if (_selectedImagePath == null || _selectedImagePath!.isEmpty) {
       _showSnackBar('Pilih gambar terlebih dahulu');
       return;
     }
 
+    // Parse bahan dari string (dipisahkan koma) menjadi list
     final ingredients = _ingredientsController.text
-        .split(',')
-        .map((e) => e.trim())
+        .split(',') // Split berdasarkan koma
+        .map((e) => e.trim()) // Trim whitespace dari setiap item
         .toList();
+    // Parse langkah-langkah dari string (dipisahkan newline) menjadi list
     final steps =
         _stepsController.text.split('\n').map((e) => e.trim()).toList();
+    // Parse durasi dari string ke integer
     final duration = int.tryParse(_durationController.text) ?? 0;
 
+    // Membuat object Recipe baru
     final newRecipe = Recipe(
-      id: widget.recipe?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      title: _titleController.text,
-      imageUrl: _selectedImagePath!,
-      duration: duration,
-      difficulty: _selectedDifficulty,
-      category: _selectedCategory,
-      ingredients: ingredients,
-      steps: steps,
+      id: widget.recipe?.id ?? DateTime.now().millisecondsSinceEpoch.toString(), // Gunakan ID lama jika edit, atau buat ID baru
+      title: _titleController.text, // Judul dari text field
+      imageUrl: _selectedImagePath!, // Path gambar yang dipilih
+      duration: duration, // Durasi dalam menit
+      difficulty: _selectedDifficulty, // Tingkat kesulitan
+      category: _selectedCategory, // Kategori
+      ingredients: ingredients, // List bahan
+      steps: steps, // List langkah-langkah
     );
 
+    // Mendapatkan notifier untuk update state
     final homeNotifier = ref.read(homeNotifierProvider.notifier);
     final savedNotifier = ref.read(savedRecipesNotifierProvider.notifier);
 
+    // Jika mode edit, update resep yang ada
     if (_isEditing) {
-      await homeNotifier.updateRecipe(newRecipe);
-      await savedNotifier.updateRecipe(newRecipe);
+      await homeNotifier.updateRecipe(newRecipe); // Update di home
+      await savedNotifier.updateRecipe(newRecipe); // Update di saved recipes jika ada
     } else {
+      // Jika mode tambah, tambahkan resep baru
       await homeNotifier.addRecipe(newRecipe);
       // --- HAPUS BARIS INI UNTUK TIDAK LANGSUNG SIMPAN KE FAVORIT ---
       // await savedNotifier.saveRecipe(newRecipe);
@@ -157,19 +187,26 @@ class _AddEditRecipeScreenState extends ConsumerState<AddEditRecipeScreen> {
     // await savedNotifier.loadSavedRecipes();
     // ref.invalidate(savedRecipesNotifierProvider);
 
+    // Tampilkan pesan sukses
     _showSnackBar(_isEditing 
-      ? 'Resep berhasil diperbarui!' 
-      : 'Resep berhasil ditambahkan!');
+      ? 'Resep berhasil diperbarui!' // Pesan untuk edit
+      : 'Resep berhasil ditambahkan!'); // Pesan untuk tambah
 
+    // Kembali ke screen sebelumnya
     if (context.mounted) context.pop();
   }
 
+  /// Method untuk menampilkan snackbar (pesan notifikasi)
+  /// 
+  /// Parameter:
+  /// - message: Pesan yang ditampilkan
+  /// - isError: Jika true, background merah (error), jika false background hijau (success)
   void _showSnackBar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        behavior: SnackBarBehavior.floating,
+        content: Text(message), // Pesan yang ditampilkan
+        backgroundColor: isError ? Colors.red : Colors.green, // Warna background sesuai tipe
+        behavior: SnackBarBehavior.floating, // Floating behavior untuk tampilan lebih baik
       ),
     );
   }

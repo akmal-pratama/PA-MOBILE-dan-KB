@@ -1,16 +1,18 @@
-import 'dart:io';
-import 'package:dapur_pintar/domain/models/recipe.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:dapur_pintar/application/providers/saved_recipes_provider.dart';
-import 'package:dapur_pintar/presentation/widgets/empty_state.dart';
-import 'package:dapur_pintar/presentation/routes/app_router.dart';
-import 'package:dapur_pintar/presentation/screens/home_screen.dart';
-import 'package:dapur_pintar/presentation/screens/scan_screen.dart';
+// Import library yang diperlukan
+import 'dart:io'; // Untuk File operations
+import 'package:dapur_pintar/domain/models/recipe.dart'; // Model Recipe
+import 'package:flutter/material.dart'; // Widget Flutter dasar
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // State management dengan Riverpod
+import 'package:go_router/go_router.dart'; // Routing dengan GoRouter
+import 'package:dapur_pintar/application/providers/saved_recipes_provider.dart'; // Provider untuk saved recipes
+import 'package:dapur_pintar/presentation/widgets/empty_state.dart'; // Widget empty state
+import 'package:dapur_pintar/presentation/routes/app_router.dart'; // Router configuration
+import 'package:dapur_pintar/presentation/screens/home_screen.dart'; // Home screen
+import 'package:dapur_pintar/presentation/screens/scan_screen.dart'; // Scan screen
+import 'package:dapur_pintar/application/providers/scan_provider.dart'; // Provider untuk scan
 
-import 'package:dapur_pintar/application/providers/scan_provider.dart'; 
-
+/// Screen untuk menampilkan resep favorit yang disimpan user
+/// Dengan bottom navigation bar untuk navigasi antar screen
 class SavedRecipesScreen extends ConsumerStatefulWidget {
   const SavedRecipesScreen({super.key});
 
@@ -101,6 +103,8 @@ class _SavedRecipesScreenState extends ConsumerState<SavedRecipesScreen> {
   }
 }
 
+/// Widget untuk menampilkan konten resep favorit
+/// Menampilkan list resep yang telah disimpan user
 class SavedContent extends ConsumerStatefulWidget {
   const SavedContent({super.key});
 

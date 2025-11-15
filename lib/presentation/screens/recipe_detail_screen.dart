@@ -1,13 +1,16 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dapur_pintar/domain/models/recipe.dart';
-import 'package:dapur_pintar/application/providers/saved_recipes_provider.dart';
-import 'package:dapur_pintar/application/providers/home_provider.dart'; 
-import 'package:go_router/go_router.dart';
+// Import library yang diperlukan
+import 'dart:io'; // Untuk File operations
+import 'package:flutter/material.dart'; // Widget Flutter dasar
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // State management dengan Riverpod
+import 'package:dapur_pintar/domain/models/recipe.dart'; // Model Recipe
+import 'package:dapur_pintar/application/providers/saved_recipes_provider.dart'; // Provider untuk saved recipes
+import 'package:dapur_pintar/application/providers/home_provider.dart'; // Provider untuk home
+import 'package:go_router/go_router.dart'; // Routing dengan GoRouter
 
+/// Screen untuk menampilkan detail lengkap resep
+/// Menampilkan gambar, judul, informasi, bahan-bahan, dan langkah-langkah
 class RecipeDetailScreen extends ConsumerWidget {
-  final Recipe recipe;
+  final Recipe recipe; // Resep yang akan ditampilkan detailnya
 
   const RecipeDetailScreen({Key? key, required this.recipe}) : super(key: key);
 
@@ -254,11 +257,17 @@ class RecipeDetailScreen extends ConsumerWidget {
       ),
     );
   }
+  /// Widget untuk menampilkan placeholder jika gambar gagal dimuat
   Widget _errorImagePlaceholder() => Container(
-        color: Colors.grey[300],
-        child: Icon(Icons.image_not_supported, size: 60, color: Colors.grey[600]),
+        color: Colors.grey[300], // Background abu-abu terang
+        child: Icon(Icons.image_not_supported, size: 60, color: Colors.grey[600]), // Icon error
       );
 
+  /// Widget untuk membuat chip informasi (durasi, kesulitan, kategori)
+  /// 
+  /// Parameter:
+  /// - icon: Icon yang ditampilkan
+  /// - text: Teks yang ditampilkan
   Widget _infoChip(IconData icon, String text) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
@@ -290,6 +299,10 @@ class RecipeDetailScreen extends ConsumerWidget {
         ),
       );
 
+  /// Widget untuk membuat header section (Bahan-bahan, Langkah-langkah)
+  /// 
+  /// Parameter:
+  /// - title: Judul section
   Widget _sectionHeader(String title) => Row(
         children: [
           Container(
@@ -316,6 +329,11 @@ class RecipeDetailScreen extends ConsumerWidget {
         ],
       );
 
+  /// Widget untuk membuat container konten dengan shadow
+  /// 
+  /// Parameter:
+  /// - width: Lebar layar untuk responsive padding
+  /// - child: Widget child yang akan ditampilkan di dalam container
   Widget _contentContainer(double width, Widget child) => Container(
         width: double.infinity,
         padding: EdgeInsets.all(width * 0.04),

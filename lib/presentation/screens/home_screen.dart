@@ -327,15 +327,17 @@ class HomeContent extends ConsumerWidget {
                     }
                   }
 
-                  // Filter: Max Duration
+                  // Filter: Max Duration (Durasi Maksimal Memasak)
                   if (state.maxDuration != null) {
                     if (state.maxDuration == -1) {
-                      // Special case: -1 means "> 30 minutes"
+                      // Kasus khusus: -1 berarti "> 30 menit"
+                      // Jika durasi resep <= 30 menit, filter out (tidak tampilkan)
                       if (recipe.duration <= 30) {
                         return false;
                       }
                     } else {
-                      // Normal case: filter recipes with duration > maxDuration
+                      // Kasus normal: filter resep dengan durasi > maxDuration
+                      // Jika durasi resep > maxDuration, filter out (tidak tampilkan)
                       if (recipe.duration > state.maxDuration!) {
                         return false;
                       }

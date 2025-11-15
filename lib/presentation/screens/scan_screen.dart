@@ -1,15 +1,18 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:dapur_pintar/application/providers/scan_provider.dart';
-import 'package:dapur_pintar/application/notifiers/scan_notifier.dart';
-import 'package:dapur_pintar/application/providers/home_provider.dart';
-import 'package:dapur_pintar/presentation/routes/app_router.dart';
-import 'package:dapur_pintar/presentation/screens/home_screen.dart';
-import 'package:dapur_pintar/presentation/screens/saved_recipes_screen.dart';
+// Import library yang diperlukan
+import 'dart:io'; // Untuk File operations
+import 'package:flutter/material.dart'; // Widget Flutter dasar
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // State management dengan Riverpod
+import 'package:go_router/go_router.dart'; // Routing dengan GoRouter
+import 'package:image_picker/image_picker.dart'; // Untuk memilih gambar dari galeri/kamera
+import 'package:dapur_pintar/application/providers/scan_provider.dart'; // Provider untuk scan
+import 'package:dapur_pintar/application/notifiers/scan_notifier.dart'; // Notifier untuk scan state
+import 'package:dapur_pintar/application/providers/home_provider.dart'; // Provider untuk home
+import 'package:dapur_pintar/presentation/routes/app_router.dart'; // Router configuration
+import 'package:dapur_pintar/presentation/screens/home_screen.dart'; // Home screen
+import 'package:dapur_pintar/presentation/screens/saved_recipes_screen.dart'; // Saved recipes screen
 
+/// Screen untuk scan/mendeteksi bahan dari gambar
+/// User dapat mengambil gambar dari galeri atau kamera untuk mendeteksi bahan
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
 
@@ -94,6 +97,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   }
 }
 
+/// Widget untuk menampilkan konten scan
+/// Menampilkan UI untuk memilih gambar, memproses, dan menampilkan hasil deteksi
 class _ScanContent extends ConsumerWidget {
   const _ScanContent();
 
@@ -131,8 +136,17 @@ class _ScanContent extends ConsumerWidget {
     return _buildPickerView(context, ref, state, width);
   }
 
+  /// Widget untuk menampilkan UI pemilihan gambar
+  /// Menampilkan tombol untuk memilih dari galeri/kamera dan preview gambar yang dipilih
+  /// 
+  /// Parameter:
+  /// - context: BuildContext untuk UI
+  /// - ref: WidgetRef untuk mengakses provider
+  /// - state: ScanState saat ini
+  /// - width: Lebar layar untuk responsive design
   Widget _buildPickerView(
       BuildContext context, WidgetRef ref, ScanState state, double width) {
+    // Cek apakah sudah mencapai maksimal 5 gambar
     final isMaxImagesReached = state.capturedImages.length >= 5; 
 
     return Container(
@@ -303,9 +317,16 @@ class _ScanContent extends ConsumerWidget {
     );
   }
 
+  /// Widget untuk menampilkan hasil deteksi bahan
+  /// Menampilkan list bahan yang terdeteksi dan tombol untuk mencari resep atau scan lagi
+  /// 
+  /// Parameter:
+  /// - context: BuildContext untuk UI
+  /// - ref: WidgetRef untuk mengakses provider
+  /// - ingredients: List bahan yang terdeteksi
   Widget _buildResults(
       BuildContext context, WidgetRef ref, List<String> ingredients) {
-    final width = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width; // Lebar layar untuk responsive design
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: width * 0.08),
       child: Column(
