@@ -198,18 +198,21 @@ class _RecipeCardState extends State<RecipeCard> with SingleTickerProviderStateM
                               bottom: 12,
                               left: 12,
                               right: 12,
+                              /// Row untuk menampilkan badge info (durasi dan difficulty)
                               child: Row(
                                 children: [
+                                  /// Badge untuk menampilkan durasi memasak
                                   _buildInfoBadge(
-                                    Icons.access_time,
-                                    '${widget.recipe.duration} min',
-                                    Colors.white.withOpacity(0.9),
+                                    Icons.access_time, /// Icon jam
+                                    '${widget.recipe.duration} min', /// Durasi dalam menit
+                                    Colors.white.withOpacity(0.9), /// Background putih semi-transparan
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 8), /// Spacing antara badge
+                                  /// Badge untuk menampilkan tingkat kesulitan
                                   _buildInfoBadge(
-                                    Icons.flag,
-                                    widget.recipe.difficulty,
-                                    Colors.white.withOpacity(0.9),
+                                    Icons.flag, /// Icon flag
+                                    widget.recipe.difficulty, /// Tingkat kesulitan (Mudah/Sedang/Sulit)
+                                    Colors.white.withOpacity(0.9), /// Background putih semi-transparan
                                   ),
                                 ],
                               ),
@@ -217,25 +220,28 @@ class _RecipeCardState extends State<RecipeCard> with SingleTickerProviderStateM
                           ],
                         ),
                       ),
+                      /// Padding yang berisi informasi teks resep (judul dan kategori)
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            /// Judul resep dengan max 2 lines dan ellipsis jika terlalu panjang
                             Text(
-                              widget.recipe.title,
+                              widget.recipe.title, /// Judul resep dari parameter
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF2E7D32),
+                                color: Color(0xFF2E7D32), /// Warna hijau gelap
                                 height: 1.3,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2, /// Max 2 baris teks
+                              overflow: TextOverflow.ellipsis, /// Jika overflow, tampilkan ellipsis (...)
                             ),
                             const SizedBox(height: 8),
+                            /// Kategori resep (Sarapan, Makan Siang, dll)
                             Text(
-                              widget.recipe.category,
+                              widget.recipe.category, /// Kategori resep dari parameter
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -259,13 +265,17 @@ class _RecipeCardState extends State<RecipeCard> with SingleTickerProviderStateM
 
 /// Widget untuk menampilkan grid/list resep yang responsive
 /// Menampilkan ListView untuk mobile dan GridView untuk tablet/desktop
+/// Secara otomatis menyesuaikan layout berdasarkan ukuran layar
 /// 
 /// Parameter:
 /// - recipeList: List resep yang akan ditampilkan
 /// - onRecipeTap: Callback saat resep diklik (opsional)
 class ResponsiveGrid extends StatelessWidget {
-  final List<Recipe> recipeList; // List resep yang akan ditampilkan
-  final Function(Recipe)? onRecipeTap; // Callback saat resep diklik (opsional)
+  /// List resep yang akan ditampilkan dalam grid/list
+  final List<Recipe> recipeList;
+  /// Callback function yang dipanggil saat salah satu resep diklik
+  /// Parameter: Recipe yang diklik
+  final Function(Recipe)? onRecipeTap;
 
   const ResponsiveGrid({
     Key? key,
@@ -274,11 +284,12 @@ class ResponsiveGrid extends StatelessWidget {
   }) : super(key: key);
 
   /// Method build yang membangun UI berdasarkan ukuran layar
+  /// Menggunakan ResponsiveUtil untuk mendeteksi device type
   @override
   Widget build(BuildContext context) {
-    // Cek apakah device adalah mobile
+    // Cek apakah device saat ini adalah mobile (width < 768)
     if (ResponsiveUtil.isMobile(context)) {
-      // Untuk mobile, gunakan ListView (satu kolom)
+      // Untuk mobile, gunakan ListView (satu kolom, scrollable vertikal)
       return ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding untuk list
         itemCount: recipeList.length, // Jumlah item dalam list
@@ -286,7 +297,7 @@ class ResponsiveGrid extends StatelessWidget {
           recipe: recipeList[index], // Resep pada index tertentu
           onTap: onRecipeTap != null
               ? () => onRecipeTap!(recipeList[index]) // Jika callback ada, panggil dengan resep
-              : null, // Jika tidak ada callback, gunakan default
+              : null, // Jika tidak ada callback, gunakan default (navigate ke detail)
         ),
       );
     } else {
@@ -294,17 +305,21 @@ class ResponsiveGrid extends StatelessWidget {
       return GridView.builder(
         padding: const EdgeInsets.all(16), // Padding untuk grid
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: ResponsiveUtil.isTablet(context) ? 2 : 3, // 2 kolom untuk tablet, 3 untuk desktop
-          childAspectRatio: 0.75, // Ratio tinggi:lebar card
-          crossAxisSpacing: 20, // Spacing horizontal antar card
-          mainAxisSpacing: 20, // Spacing vertikal antar card
+          /// 2 kolom untuk tablet (768-1200px), 3 kolom untuk desktop (>1200px)
+          crossAxisCount: ResponsiveUtil.isTablet(context) ? 2 : 3,
+          /// Ratio tinggi:lebar card (0.75 = card lebih tinggi dari lebar)
+          childAspectRatio: 0.75,
+          /// Spacing horizontal antar card (20px)
+          crossAxisSpacing: 20,
+          /// Spacing vertikal antar card (20px)
+          mainAxisSpacing: 20,
         ),
         itemCount: recipeList.length, // Jumlah item dalam grid
         itemBuilder: (context, index) => RecipeCard(
           recipe: recipeList[index], // Resep pada index tertentu
           onTap: onRecipeTap != null
               ? () => onRecipeTap!(recipeList[index]) // Jika callback ada, panggil dengan resep
-              : null, // Jika tidak ada callback, gunakan default
+              : null, // Jika tidak ada callback, gunakan default (navigate ke detail)
         ),
       );
     }
