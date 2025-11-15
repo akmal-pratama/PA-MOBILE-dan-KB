@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005315471143",
+    "project_id": "dapurpintar-f2f57",
+    "storage_bucket": "dapurpintar-f2f57.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005315471143:android:0b95b2f405d0b64bdd1b02",
+        "android_client_info": {
+          "package_name": "com.example.dapur_pintar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj8sThaCpbJTjHzy9RyRAS1-Wyyes6wnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
